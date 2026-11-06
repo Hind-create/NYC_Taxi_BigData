@@ -19,7 +19,6 @@ Projet Big Data basé sur les données officielles NYC TLC Yellow Taxi Trip Reco
 
 La préparation ML prévue comprend un découpage temporel train/test (entraînement sur la partie chronologiquement antérieure et test sur la partie ultérieure), une baseline fondée sur la médiane du `fare_amount` du jeu d'entraînement, puis la comparaison de trois techniques : régression linéaire, Random Forest Regressor et Gradient Boosting Regressor. Une seule technique sera ensuite réglée par recherche d'hyperparamètres. Les métriques d'évaluation seront MAE et RMSE.
 
-**Validation du cas métier par l'enseignante : en attente.** Le statut ne sera changé qu'après confirmation explicite de l'enseignante.
 
 ## 3. Source des données
 
@@ -291,10 +290,7 @@ Vérifier dans les sorties que les fichiers ont `replication=2`, `Live_repl=2`, 
 
 ### Application Spark
 
-Ouvrir http://localhost:8080 pendant l'exécution du job streaming. Vérifier que l'application est active et que les deux Workers sont enregistrés. Vérifier également les interfaces `http://localhost:8081` et `http://localhost:8082`.
 
-
-- [ ] Captures ajoutées dans `docs/captures/`.
 
 ## 13. Captures 
 
