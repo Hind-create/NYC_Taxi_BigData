@@ -348,17 +348,8 @@ Pour les semaines 3 et 4, un service PostgreSQL pourra être ajouté pour la bas
 - QASSABA OUMAYMA
 - BOUHAMIDI MOSTAFA
 
-## 18. Contributions des membres
 
-À compléter avec les tâches réellement réalisées par chacun (les commits Git en sont la trace).
 
-| Étudiant | Tâches réalisées | Livrables / fichiers |
-|---|---|---|
-| EL BAZ HIND | [À COMPLÉTER] | [À COMPLÉTER] |
-| JDANI FATIMA ZAHRA | [À COMPLÉTER] | [À COMPLÉTER] |
-| QASSABA OUMAYMA | [À COMPLÉTER] | [À COMPLÉTER] |
-| BOUHAMIDI MOSTAFA | [À COMPLÉTER] | [À COMPLÉTER] |
-
-## 19. Dépôt GitHub
+## 18. Dépôt GitHub
 
 https://github.com/Hind-create/NYC_Taxi_BigData
