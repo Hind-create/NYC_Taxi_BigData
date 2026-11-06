@@ -293,28 +293,12 @@ Vérifier dans les sorties que les fichiers ont `replication=2`, `Live_repl=2`, 
 
 Ouvrir http://localhost:8080 pendant l'exécution du job streaming. Vérifier que l'application est active et que les deux Workers sont enregistrés. Vérifier également les interfaces `http://localhost:8081` et `http://localhost:8082`.
 
-## 13. Vérifications réalisées / à réaliser
 
-Les cases ci-dessous sont volontairement laissées non cochées pour la nouvelle configuration : elles doivent être cochées après exécution effective sur la machine du groupe.
-
-- [ ] `docker compose config` sans erreur.
-- [ ] Les 8 conteneurs/services attendus apparaissent et sont dans l'état attendu.
-- [ ] Spark Master et les deux Workers sont visibles.
-- [ ] HDFS NameNode et les deux DataNodes sont visibles.
-- [ ] Topic `taxi-trips` créé automatiquement avec 3 partitions.
-- [ ] Producer → Kafka → Consumer validé.
-- [ ] Test de lecture Kafka avec `spark-submit` sur le cluster Spark validé.
-- [ ] Ingestion batch Parquet vers HDFS validée par `hdfs dfs -ls` et `hdfs fsck`.
-- [ ] Ingestion Kafka → Spark Structured Streaming → HDFS validée.
-- [ ] Checkpoint streaming visible dans HDFS.
-- [ ] Réplication HDFS égale à 2 et état `HEALTHY` pour `/taxi/raw`.
-- [ ] Réplication HDFS égale à 2 et état `HEALTHY` pour `/taxi/stream/raw`.
-- [ ] Application streaming active sur Spark avec les deux Workers enregistrés.
 - [ ] Captures ajoutées dans `docs/captures/`.
 
-## 14. Captures à déposer
+## 13. Captures 
 
-Ajouter les captures réelles suivantes dans `docs/captures/` :
+
 
 1. `01_docker_compose_ps.png` — état des services Docker.
 2. `02_spark_workers_application.png` — deux Workers et application streaming active.
@@ -325,23 +309,11 @@ Ajouter les captures réelles suivantes dans `docs/captures/` :
 7. `07_hdfs_taxi_raw.png` — fichiers batch.
 8. `08_hdfs_taxi_stream_raw.png` — fichiers Parquet streaming.
 
-Ne pas créer de fausses captures : elles doivent provenir de l'exécution réelle.
 
-## 15. Suite du projet (hors Livrable 1)
 
-Pour les semaines 3 et 4, un service PostgreSQL pourra être ajouté pour la base de restitution et les résultats analytiques. Il n'est volontairement pas présent dans le `docker-compose.yml` actuel. La partie Machine Learning sera développée après validation du cas métier.
 
-## 16. État d'avancement
 
-- [ ] Validation du cas métier par l'enseignante.
-- [ ] Infrastructure Docker validée (toutes les vérifications de la section « Vérifications réalisées »).
-- [ ] Ingestion batch validée.
-- [ ] Ingestion streaming et checkpoint HDFS validés.
-- [ ] Captures finales ajoutées.
-- [ ] Contributions Git des quatre membres effectuées.
-- [ ] Invitation du professeur au dépôt GitHub envoyée si un accès privé est demandé.
-
-## 17. Membres du groupe
+## 14. Membres du groupe
 
 - EL BAZ HIND
 - JDANI FATIMA ZAHRA
@@ -350,6 +322,6 @@ Pour les semaines 3 et 4, un service PostgreSQL pourra être ajouté pour la bas
 
 
 
-## 18. Dépôt GitHub
+## 15. Dépôt GitHub
 
 https://github.com/Hind-create/NYC_Taxi_BigData
