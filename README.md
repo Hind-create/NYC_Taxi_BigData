@@ -1,27 +1,27 @@
-# NYC Taxi – Pipeline Big Data de bout en bout
+# NYC Taxi – Big Data Pipeline
 
 ## 1. Présentation du projet
 
-Ce projet consiste à concevoir et mettre en place un pipeline Big Data de bout en bout à partir des données **NYC TLC Yellow Taxi Trip Records**.
+Ce projet consiste à concevoir un pipeline Big Data de bout en bout basé sur les données NYC TLC Yellow Taxi Trip Records.
 
-L'objectif est de construire une infrastructure distribuée permettant l'ingestion, le stockage et le traitement des données de trajets de taxis de New York.
+L'objectif est de mettre en place une infrastructure distribuée permettant l'ingestion, le stockage et le traitement de données de trajets de taxis.
 
 ## 2. Objectif du Livrable 1
 
-Le premier livrable porte sur la mise en place d'une infrastructure distribuée avec Docker Compose et sur la validation de l'ingestion des événements avec Apache Kafka.
+Le premier livrable consiste à déployer une infrastructure distribuée avec Docker Compose et à vérifier la publication d'événements dans Kafka.
 
 L'infrastructure comprend :
 
-- **Apache Spark :** un Master et deux Workers.
-- **HDFS :** un NameNode et deux DataNodes.
-- **Apache Kafka :** un broker et le topic `taxi-trips`.
-- **Python :** un Producer pour lire les données Parquet et publier les événements JSON dans Kafka.
+- Apache Spark : 1 Master et 2 Workers.
+- Hadoop HDFS : 1 NameNode et 2 DataNodes.
+- Apache Kafka : 1 Broker et le topic `taxi-trips`.
+- Python : un Producer pour publier les événements issus du dataset NYC Taxi.
 
 ## 3. Architecture du projet
 
 ![Architecture globale du projet](docs/architecture.png)
 
-Le schéma présente l'architecture globale du projet. Il distingue les composants réalisés dans le premier livrable des fonctionnalités prévues dans les étapes suivantes.
+Le schéma présente l'infrastructure globale et distingue les composants opérationnels du premier livrable des traitements prévus dans les étapes suivantes.
 
 ## 4. Technologies utilisées
 
@@ -32,38 +32,20 @@ Le schéma présente l'architecture globale du projet. Il distingue les composan
 - Python
 - Pandas
 - PyArrow
+- kafka-python
 - Git et GitHub
 
-## 5. Fonctionnement de l'ingestion
+## 5. Dataset
 
-Le processus d'ingestion réalisé suit les étapes suivantes :
+Source officielle : [NYC TLC Trip Record Data](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page)
 
-1. Lecture du fichier Parquet NYC Yellow Taxi avec Python.
-2. Extraction des informations des trajets.
-3. Transformation des enregistrements en événements JSON.
-4. Publication des événements dans le topic Kafka `taxi-trips`.
-5. Consommation et vérification des événements avec un Kafka Consumer.
+Fichier utilisé pour les tests :
 
-## 6. Vérifications réalisées
+`yellow_tripdata_2025-01.parquet`
 
-Les tests suivants ont été effectués :
+Le dataset n'est pas inclus dans ce dépôt en raison de sa taille. Il doit être téléchargé séparément et placé dans le dossier `data/`.
 
-- Démarrage des conteneurs Docker.
-- Vérification du Spark Master et des deux Workers.
-- Vérification du NameNode et des deux DataNodes.
-- Vérification des volumes persistants.
-- Vérification de la réplication HDFS avec un facteur égal à 2.
-- Création et description du topic Kafka `taxi-trips`.
-- Publication des événements par le Producer Python.
-- Réception des événements JSON par le Consumer Kafka.
-
-Le contrôle HDFS a notamment confirmé :
-- `Status: HEALTHY`
-- `Default replication factor: 2`
-- `Average block replication: 2.0`
-- `Missing blocks: 0`
-
-## 7. Structure du dépôt
+## 6. Structure du projet
 
 ```text
 NYC_Taxi_BigData/
@@ -85,9 +67,7 @@ NYC_Taxi_BigData/
 └── README.md
 ```
 
-Le dataset Parquet n'est pas inclus dans le dépôt GitHub en raison de sa taille. Il doit être téléchargé depuis la source officielle.
-
-## 8. Installation et lancement
+## 7. Installation et exécution
 
 ### Prérequis
 
@@ -113,14 +93,18 @@ docker compose -f config/docker-compose.yml ps
 ### Installer les dépendances Python
 
 ```bash
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
 ```
 
 ### Lancer le Producer
 
+Placer le fichier Parquet dans `data/`, puis exécuter :
+
 ```bash
 python producer/producer.py
 ```
+
+Le Producer publie les événements dans le topic Kafka `taxi-trips`.
 
 ### Consulter les événements Kafka
 
@@ -128,17 +112,25 @@ python producer/producer.py
 docker exec -it kafka /opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server kafka:9092 --topic taxi-trips --from-beginning
 ```
 
-## 9. Source des données
+## 8. Vérifications réalisées
 
-Les données utilisées proviennent de la source officielle NYC Taxi and Limousine Commission :
+- Démarrage des services Docker.
+- Vérification du Spark Master et des deux Workers.
+- Vérification du NameNode et des deux DataNodes.
+- Création du topic Kafka `taxi-trips`.
+- Publication de 1 000 événements avec le Producer Python.
+- Réception des événements JSON avec le Consumer Kafka.
+- Vérification de la réplication HDFS à 2 avec `hdfs fsck`.
+- Vérification de l'état du système de fichiers : `HEALTHY`.
 
-https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page
+Les captures de ces vérifications sont disponibles dans `docs/captures/`.
+
+## 9. État d'avancement
+
+Le Livrable 1 couvre le déploiement de l'infrastructure distribuée et le test de l'ingestion des événements dans Kafka.
+
+L'intégration de Spark Structured Streaming, l'archivage automatique dans HDFS et les traitements analytiques seront réalisés dans les étapes suivantes.
 
 ## 10. Membres du groupe
-EL BAZ HIND,JDANI FATIMA ZAHRA,QASSABA OUMAYMA,BOUHAMIDI MOSTAFA.
 
-## 11. État d'avancement
-
-Le Livrable 1 couvre la mise en place de l'infrastructure Docker, la configuration du cluster Spark et HDFS, ainsi que la validation de l'ingestion des événements avec Kafka.
-
-Les étapes de traitement en streaming, d'analyse et de Machine Learning seront développées dans les livrables suivants.
+EL BAZ HIND,JDANI FATIMA ZAHRA,QASSABA OUMAYMA,BOUHAMIDI MOSTAFA
