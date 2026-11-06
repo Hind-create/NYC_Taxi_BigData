@@ -1,0 +1,24 @@
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Données volumineuses
+data/*
+*.parquet
+!data/.gitkeep
+
+# Logs
+*.log
+
+# Environnement
+.env
+
+# IDE
+.vscode/
+
+# Système
+.DS_Store
+Thumbs.db
