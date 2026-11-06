@@ -1,10 +1,6 @@
-
 services:
-
-  # ================= HDFS =================
-
   namenode:
-    image: bde2020/hadoop-namenode:2.0.0-hadoop3.2.1-java8
+    image: ${HADOOP_NAMENODE_IMAGE:-bde2020/hadoop-namenode:2.0.0-hadoop3.2.1-java8}
     container_name: hdfs-namenode
     restart: unless-stopped
     ports:
@@ -13,19 +9,20 @@ services:
     environment:
       CLUSTER_NAME: nyc-taxi-cluster
       CORE_CONF_fs_defaultFS: hdfs://namenode:9000
-      HDFS_CONF_dfs_replication: "2"
+      HDFS_CONF_dfs_replication: "${HDFS_REPLICATION:-2}"
+      HDFS_CONF_dfs_permissions_enabled: "false"
     volumes:
       - namenode_data:/hadoop/dfs/name
 
   datanode1:
-    image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
+    image: ${HADOOP_DATANODE_IMAGE:-bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8}
     container_name: hdfs-datanode1
     restart: unless-stopped
     ports:
       - "9864:9864"
     environment:
       CORE_CONF_fs_defaultFS: hdfs://namenode:9000
-      HDFS_CONF_dfs_replication: "2"
+      HDFS_CONF_dfs_replication: "${HDFS_REPLICATION:-2}"
       SERVICE_PRECONDITION: namenode:9870
     volumes:
       - datanode1_data:/hadoop/dfs/data
@@ -33,67 +30,103 @@ services:
       - namenode
 
   datanode2:
-    image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
+    image: ${HADOOP_DATANODE_IMAGE:-bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8}
     container_name: hdfs-datanode2
     restart: unless-stopped
     ports:
       - "9865:9864"
     environment:
       CORE_CONF_fs_defaultFS: hdfs://namenode:9000
-      HDFS_CONF_dfs_replication: "2"
+      HDFS_CONF_dfs_replication: "${HDFS_REPLICATION:-2}"
       SERVICE_PRECONDITION: namenode:9870
     volumes:
       - datanode2_data:/hadoop/dfs/data
     depends_on:
       - namenode
 
-  # ================= SPARK =================
-
   spark-master:
-    image: apache/spark:3.5.3
+    image: ${SPARK_IMAGE:-nyc-taxi-spark:3.5.3-python3.11}
+    build:
+      context: ..
+      dockerfile: config/spark/Dockerfile
     container_name: spark-master
     restart: unless-stopped
+    hostname: spark-master
     command:
       - /opt/spark/bin/spark-class
       - org.apache.spark.deploy.master.Master
+    environment:
+      SPARK_MASTER_HOST: spark-master
+      SPARK_MASTER_PORT: "7077"
+      SPARK_MASTER_WEBUI_PORT: "8080"
+      PYSPARK_PYTHON: python3
+      PYSPARK_DRIVER_PYTHON: python3
     ports:
       - "8080:8080"
       - "7077:7077"
+    volumes:
+      - ../scripts:/opt/app/scripts:ro
+    depends_on:
+      - namenode
 
   spark-worker1:
-    image: apache/spark:3.5.3
+    image: ${SPARK_IMAGE:-nyc-taxi-spark:3.5.3-python3.11}
+    build:
+      context: ..
+      dockerfile: config/spark/Dockerfile
     container_name: spark-worker1
     restart: unless-stopped
+    hostname: spark-worker1
     command:
       - /opt/spark/bin/spark-class
       - org.apache.spark.deploy.worker.Worker
       - --webui-port
       - "8081"
+      - --cores
+      - "${SPARK_WORKER_CORES:-2}"
+      - --memory
+      - "${SPARK_WORKER_MEMORY:-2g}"
       - spark://spark-master:7077
+    environment:
+      SPARK_WORKER_CORES: "${SPARK_WORKER_CORES:-2}"
+      SPARK_WORKER_MEMORY: "${SPARK_WORKER_MEMORY:-2g}"
+      PYSPARK_PYTHON: python3
+      PYSPARK_DRIVER_PYTHON: python3
     ports:
       - "8081:8081"
     depends_on:
       - spark-master
 
   spark-worker2:
-    image: apache/spark:3.5.3
+    image: ${SPARK_IMAGE:-nyc-taxi-spark:3.5.3-python3.11}
+    build:
+      context: ..
+      dockerfile: config/spark/Dockerfile
     container_name: spark-worker2
     restart: unless-stopped
+    hostname: spark-worker2
     command:
       - /opt/spark/bin/spark-class
       - org.apache.spark.deploy.worker.Worker
       - --webui-port
       - "8082"
+      - --cores
+      - "${SPARK_WORKER_CORES:-2}"
+      - --memory
+      - "${SPARK_WORKER_MEMORY:-2g}"
       - spark://spark-master:7077
+    environment:
+      SPARK_WORKER_CORES: "${SPARK_WORKER_CORES:-2}"
+      SPARK_WORKER_MEMORY: "${SPARK_WORKER_MEMORY:-2g}"
+      PYSPARK_PYTHON: python3
+      PYSPARK_DRIVER_PYTHON: python3
     ports:
       - "8082:8082"
     depends_on:
       - spark-master
 
-  # ================= KAFKA =================
-
   kafka:
-    image: apache/kafka:3.9.1
+    image: ${KAFKA_IMAGE:-apache/kafka:3.9.1}
     container_name: kafka
     restart: unless-stopped
     ports:
@@ -116,11 +149,37 @@ services:
       KAFKA_LOG_DIRS: /var/lib/kafka/data
     volumes:
       - kafka_data:/var/lib/kafka/data
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - /opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092 >/dev/null 2>&1
+      interval: 10s
+      timeout: 5s
+      retries: 15
+      start_period: 20s
 
-# ================= VOLUMES PERSISTANTS =================
+  kafka-init:
+    image: ${KAFKA_IMAGE:-apache/kafka:3.9.1}
+    container_name: kafka-init
+    restart: "no"
+    depends_on:
+      kafka:
+        condition: service_healthy
+    entrypoint: ["/bin/bash", "-c"]
+    command: >
+      /opt/kafka/bin/kafka-topics.sh
+      --bootstrap-server kafka:9092
+      --create --if-not-exists
+      --topic taxi-trips
+      --partitions 3
+      --replication-factor 1
 
 volumes:
   namenode_data:
+    name: config_namenode_data
   datanode1_data:
+    name: config_datanode1_data
   datanode2_data:
+    name: config_datanode2_data
   kafka_data:
+    name: config_kafka_data

@@ -1,4 +1,6 @@
-
+# A FAIRE avant l'envoi : installer, tester, puis remplacer par les versions
+# réellement installées (commande : python -m pip freeze), par exemple nom==version.
+# La fiche du projet exige des dépendances fixées.
 kafka-python
 pyarrow
 pandas

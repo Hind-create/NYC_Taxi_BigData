@@ -1,24 +1,34 @@
+# Données volumineuses
+*.parquet
+*.csv
+data/*
+!data/.gitkeep
+# Petit fichier de correspondance des zones (utile pour la suite)
+!taxi_zone_lookup.csv
+!data/taxi_zone_lookup.csv
+
+# Secrets / configuration locale
+.env
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa
+id_ed25519
 
 # Python
 __pycache__/
-*.pyc
+*.py[cod]
 .venv/
 venv/
 
-# Données volumineuses
-data/*
-*.parquet
-!data/.gitkeep
-
-# Logs
+# Logs et fichiers temporaires
 *.log
+*.tmp
+.ivy/
 
-# Environnement
-.env
-
-# IDE
+# IDE / système
 .vscode/
-
-# Système
+.idea/
 .DS_Store
 Thumbs.db
